@@ -12,6 +12,7 @@ const mongoose = require('mongoose');
 const userRoutes = require('./routes/user')
 // importer des fichiers de routing sauce
 const sauceRoutes = require('./routes/sauce')
+const path = require('path');
 // variables d'environnement
 const userName= process.env.DB_USERNAME
 const password = process.env.DB_PASSWORD
@@ -32,6 +33,7 @@ mongoose.connect(`mongodb+srv://${userName}:${password}@${accessMongo}/?retryWri
 .catch(()=> console.log('Connexion à MongoDB échouée!'));
 // Utilisation du body-parser pour analyser les corps de requête pour les données JSON
 app.use(bodyParser.json());
+app.use('/images', express.static(path.join(__dirname, 'images')));
 app.use('/api/auth',userRoutes);
 app.use('/api/sauces',sauceRoutes);
 // exporter l'applicat° pour qu'on puisse y accéder depuis les autres fichiers notemment notre server node //

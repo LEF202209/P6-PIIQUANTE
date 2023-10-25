@@ -6,5 +6,5 @@ const router = express.Router();
 const sauceCtrl = require('../controllers/sauce')
 
 router.post('/',auth,multer,sauceCtrl.createSauce);
-
+router.get('/',auth,multer,sauceCtrl.getAllSauces);
 module.exports = router;
