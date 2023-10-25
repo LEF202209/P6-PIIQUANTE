@@ -29,7 +29,7 @@ mongoose.connect(`mongodb+srv://${userName}:${password}@${accessMongo}/?retryWri
 {useNewUrlParser:true,useUnifiedTopology:true})
 .then(()=> console.log('Connexion à MongoDB réussie !'))
 .catch(()=> console.log('Connexion à MongoDB échouée!'));
-
+// Utilisation du body-parser pour analyser les corps de requête pour les données JSON
 app.use(bodyParser.json());
 app.use('/api/auth',userRoutes);
 // exporter l'applicat° pour qu'on puisse y accéder depuis les autres fichiers notemment notre server node //
