@@ -4,6 +4,8 @@
 const bcrypt = require('bcrypt')
 const User = require('../models/User')
 const jwt = require('jsonwebtoken')
+// variable d'environnement
+const keyToken = process.env.KEY_TOKEN
 
 //fonction de création d'un compte
 exports.signup = (req, res) => {
@@ -36,7 +38,7 @@ exports.login = (req, res, next) => {
                         userId: user._id,
                         token : jwt.sign(
                           { userId: user._id },
-                          'RANDOM_TOKEN_SECRET',
+                          `${keyToken}`,
                           { expiresIn: '24h' }
                       )
                     });

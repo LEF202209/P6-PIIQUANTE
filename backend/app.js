@@ -10,7 +10,8 @@ const app = express();
 const mongoose = require('mongoose');
 // importer des fichiers de routing user
 const userRoutes = require('./routes/user')
-
+// importer des fichiers de routing sauce
+const sauceRoutes = require('./routes/sauce')
 // variables d'environnement
 const userName= process.env.DB_USERNAME
 const password = process.env.DB_PASSWORD
@@ -32,5 +33,6 @@ mongoose.connect(`mongodb+srv://${userName}:${password}@${accessMongo}/?retryWri
 // Utilisation du body-parser pour analyser les corps de requête pour les données JSON
 app.use(bodyParser.json());
 app.use('/api/auth',userRoutes);
+app.use('/api/sauces',sauceRoutes);
 // exporter l'applicat° pour qu'on puisse y accéder depuis les autres fichiers notemment notre server node //
 module.exports = app;
