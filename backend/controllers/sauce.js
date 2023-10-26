@@ -1,4 +1,5 @@
 const Sauce = require('../models/Sauce');
+const fs= require('fs');
 
 
 function createSauce (req, res) {
@@ -59,4 +60,23 @@ function createSauce (req, res) {
     .catch(error => res.status(400).json({error}))
   }
 
-  module.exports =  {  createSauce, getAllSauces, getOneSauce, modifySauce }
+  function deleteSauce (req,res){
+    Sauce.findOne ({_id:req.params.id})
+    .then((sauce) =>{
+        if (!sauce){
+            res.status(404).json({message:'sauce inexistante!'})
+        }
+        else if (sauce.userId!==req.auth.userId) {
+            res.status(403).json({message:'accès non autorisé!'})
+        }
+        else {
+            const filename = sauce.imageUrl.split('/images/')[1];
+            fs.unlink(`images/${filename}`, () => {
+            Sauce.deleteOne({_id:req.params.id})
+            .then(() => res.status(200).json({message:'Sauce supprimée!'}))
+            .catch(error => res.status(400).json({error}))
+        }) 
+    }})
+}
+
+  module.exports =  {  createSauce, getAllSauces, getOneSauce, modifySauce, deleteSauce }
