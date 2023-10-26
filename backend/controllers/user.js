@@ -6,7 +6,6 @@ const User = require('../models/User')
 const jwt = require('jsonwebtoken')
 // variable d'environnement
 const keyToken = process.env.KEY_TOKEN
-console.log('key_token', keyToken)
 
 //fonction de création d'un compte
 exports.signup = (req, res) => {
