@@ -17,6 +17,8 @@ const path = require('path');
 const userName= process.env.DB_USERNAME
 const password = process.env.DB_PASSWORD
 const accessMongo = process.env.DB_ACCESSMONGO
+// sécurité
+const helmet = require('helmet');
 
 //  cors : déclaration des autorisations //
 app.use((req, res, next) => {
@@ -36,5 +38,8 @@ app.use(bodyParser.json());
 app.use('/images', express.static(path.join(__dirname, 'images')));
 app.use('/api/auth',userRoutes);
 app.use('/api/sauces',sauceRoutes);
+// sécurité
+app.use(helmet());
+app.use(helmet.crossOriginResourcePolicy({ policy : "cross-origin" })) ;
 // exporter l'applicat° pour qu'on puisse y accéder depuis les autres fichiers notemment notre server node //
 module.exports = app;
