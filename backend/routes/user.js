@@ -1,13 +1,14 @@
 /************************************************************/
 /***************** Routes user *****************************/
 /************************************************************/
-const express = require('express')
-const router = express.Router()
-const userCtrl = require('../controllers/user')
+const express = require('express');
+const router = express.Router();
+const userCtrl = require('../controllers/user');
+const password = require('../middleware/password-validator');
 
 // inscription user routes //
-router.post ('/signup', userCtrl.signup)
+router.post ('/signup', password, userCtrl.signup);
 // connection user routes //
-router.post ('/login', userCtrl.login)
+router.post ('/login', userCtrl.login);
 
-module.exports = router
+module.exports = router;
