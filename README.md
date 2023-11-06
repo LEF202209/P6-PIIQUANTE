@@ -10,19 +10,19 @@ Pour la mise en place du backend, j'ai utilisé  :
 
 Instructions d'installation:
 
-- Cloner ce repository 
+1. Cloner ce repository 
 git clone
 
-- Personnalité le fichier .env avec les identifiants de connexion MongoDB Atlas
+2.  Personnalité le fichier .env avec les identifiants de connexion MongoDB Atlas
 
-- Démarrer le frontend
-  1) cd frontend 
-  2) Installer les dépendances : npm install
-  3) Lancer npm run start
+3.  Démarrer le frontend
+ - cd frontend 
+ - Installer les dépendances : npm install
+ - Lancer npm run start
 
-- Démarrer le serveur sur le dossier backend
-  1) cd ../backend
-  2) Installer les dépendances : npm install
-  3) Lancer node server
+4.  Démarrer le serveur sur le dossier backend
+  - cd ../backend
+  -  Installer les dépendances : npm install
+  - Lancer node server
      
 
