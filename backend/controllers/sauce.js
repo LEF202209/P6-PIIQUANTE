@@ -1,15 +1,19 @@
 const Sauce = require('../models/Sauce');
 const fs= require('fs');
+const xss= require('xss');
 var messageMAJ='';
 
 
 function createSauce (req, res) {
-    const sauceObject = JSON.parse(req.body.sauce)
+    let sauceObject = JSON.parse(req.body.sauce);
+    // Ajout sécurité xss : Appel de la fonction escapeObject pour échapper les propriétés de type string
+    sauceObject = escapeObject(sauceObject);
+
     delete sauceObject._id;
     delete sauceObject._userId;
     //ajout des informations du formulaire a partir du model sauce
     const sauce = new Sauce({
-      ...sauceObject,
+      ...sauceObject, 
       userId: req.auth.userId,
       imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`,
       likes: '0',
@@ -37,7 +41,7 @@ function getAllSauces  (req, res) {
 function modifySauce (req,res){
     // format objet transmis sous forme de chaîne de caractères
     // si téléchargement fichier
-    const sauceObject = req.file? 
+    let sauceObject = req.file? 
     {
         ...JSON.parse(req.body.sauce),
         imageUrl:`${req.protocol}://${req.get('host')}/images/${req.file.filename}`
@@ -54,6 +58,10 @@ function modifySauce (req,res){
             res.status(403).json({message:'accès non autorisé!'})
         }
         else {
+            // Ajout sécurité xss : Appel de la fonction escapeObject pour échapper les propriétés de type string
+            sauceObject = escapeObject(sauceObject);
+
+            // Mise à jour des données
             if (req.file) {
                 const filename = sauce.imageUrl.split('/images/')[1];
                 fs.unlink(`images/${filename}`, () => {
@@ -162,5 +170,14 @@ function likeSauce (req,res){
     })
     .catch(error => res.status(400).json({error}))
   }
+
+  // Sécurité xss : Échapper chaque propriété de sauceObject
+  function escapeObject (sauceObj) {
+  for (let key in sauceObj) {
+    if (typeof sauceObj[key] === 'string') {
+   sauceObj[key] = xss(sauceObj[key]);
+   }}
+   return sauceObj
+}
 
 module.exports =  {  createSauce, getAllSauces, getOneSauce, modifySauce, deleteSauce,likeSauce }
