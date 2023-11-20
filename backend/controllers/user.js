@@ -25,10 +25,10 @@ exports.signup = (req, res) => {
                 email: encryptData(req.body.email),
                 password: hash
             })
+            console.log(user.email);
             user.save()
                 .then(() => res.status(201).send({message: 'utilisateur créé !'}))
                 .catch(error =>{ 
-                    console.log("error =",error);
                     res.status(409).send({ message: 'User pas enregistré : ' + error})})
         })
         .catch(error => res.status(500).json({error}))

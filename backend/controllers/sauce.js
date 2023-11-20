@@ -3,15 +3,25 @@ const fs= require('fs');
 const xss= require('xss');
 var messageMAJ='';
 
+  // Sécurité xss : Échapper chaque propriété de sauceObject
+function escapeObject (sauceObj) {
+    for (let key in sauceObj) {
+      if (typeof sauceObj[key] === 'string') {
+     sauceObj[key] = xss(sauceObj[key]);
+     }}
+     return sauceObj
+}
+
 
 function createSauce (req, res) {
+    // Importer les données saisies
     let sauceObject = JSON.parse(req.body.sauce);
-    // Ajout sécurité xss : Appel de la fonction escapeObject pour échapper les propriétés de type string
+    //Appel de la fonction escapeObject pour échapper les propriétés de type string (Sécurité xss)
     sauceObject = escapeObject(sauceObject);
 
     delete sauceObject._id;
     delete sauceObject._userId;
-    //ajout des informations du formulaire a partir du model sauce
+    //Ajout des informations du formulaire à partir du modèle sauce
     const sauce = new Sauce({
       ...sauceObject, 
       userId: req.auth.userId,
@@ -21,6 +31,7 @@ function createSauce (req, res) {
 	  usersLiked: '[]',
   	  usersDisliked: '[]'
     })
+    // Sauvegarde des données ajoutées
     sauce.save()
       .then(() => res.status(201).json({ message: 'Sauce enregistrée !' }))
       .catch(error => res.status(400).json({ error }))
@@ -39,16 +50,22 @@ function getAllSauces  (req, res) {
   }
 
 function modifySauce (req,res){
-    // format objet transmis sous forme de chaîne de caractères
+    // importer les nouvelles données
     // si téléchargement fichier
     let sauceObject = req.file? 
     {
+        // format objet transmis sous forme de chaîne de caractères
         ...JSON.parse(req.body.sauce),
         imageUrl:`${req.protocol}://${req.get('host')}/images/${req.file.filename}`
     }:
-    {...(req.body)};
-    
+    {...(req.body)};    
     delete sauceObject._userId;
+    const updateSauce =() => {
+        Sauce.updateOne({_id:req.params.id},{...sauceObject,_id:req.params.id})
+        .then(() => res.status(200).json({message:'Sauce modifiée!'}))
+        .catch(error => res.status(400).json({error}))
+    }
+    // On cherche la sauce à modifier à partir de l’ID
     Sauce.findOne ({_id:req.params.id})
     .then((sauce) =>{
         if (!sauce){
@@ -58,22 +75,21 @@ function modifySauce (req,res){
             res.status(403).json({message:'accès non autorisé!'})
         }
         else {
-            // Ajout sécurité xss : Appel de la fonction escapeObject pour échapper les propriétés de type string
+            // Appel à la fonct° escapeObject pour échapper les propriétés de type string (Sécurité xss)
             sauceObject = escapeObject(sauceObject);
-
             // Mise à jour des données
             if (req.file) {
-                const filename = sauce.imageUrl.split('/images/')[1];
-                fs.unlink(`images/${filename}`, () => {
-                Sauce.updateOne({_id:req.params.id},{...sauceObject,_id:req.params.id})
-                .then(() => res.status(200).json({message:'Sauce modifiée!'}))
-                .catch(error => res.status(400).json({error}))
-                }) 
+                const filename = sauce.imageUrl.split('/images/')[1];         
+                if (filename !== req.file.filename) {
+                    // supprimer ancien fichier
+                    fs.unlink(`images/${filename}`, () => updateSauce());
+                } 
+                else {
+                    updateSauce();
+                }
             }
             else {
-                Sauce.updateOne({_id:req.params.id},{...sauceObject,_id:req.params.id})
-                .then(() => res.status(200).json({message:'Sauce modifiée!'}))
-                .catch(error => res.status(400).json({error}))
+                updateSauce();
             }
         }
     })
@@ -103,10 +119,8 @@ function deleteSauce (req,res){
 function likeSauce (req,res){
     const userId = req.body.userId;
     const like = req.body.like;
-    console.log('like'+like);
     Sauce.findOne ({_id:req.params.id})
     .then((sauce) =>{
-        console.log('sauce'+sauce.name);
         if (!sauce){
             res.status(404).json({message:'sauce inexistante!'})
         }
@@ -170,14 +184,5 @@ function likeSauce (req,res){
     })
     .catch(error => res.status(400).json({error}))
   }
-
-  // Sécurité xss : Échapper chaque propriété de sauceObject
-  function escapeObject (sauceObj) {
-  for (let key in sauceObj) {
-    if (typeof sauceObj[key] === 'string') {
-   sauceObj[key] = xss(sauceObj[key]);
-   }}
-   return sauceObj
-}
 
 module.exports =  {  createSauce, getAllSauces, getOneSauce, modifySauce, deleteSauce,likeSauce }

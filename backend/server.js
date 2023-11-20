@@ -1,10 +1,4 @@
-// const http= require('http');
-// const app= require('./app');
-// app.set('port',process.env.PORT ||3000);
-// const server = http.createServer(app);
-// server.listen(process.env.PORT ||3000)
-
-// importer le package http de node //
+// importer le package http de Node //
 const http=require('http');
 // importer l'application express //
 const app=require('./app');
@@ -45,7 +39,7 @@ const normalizePort = val => {
     }
   };
   
-// créer le serveur //
+// créer le serveur et lier l'application 'express' au serveur http //
 const server=http.createServer(app);
 // affichage de l'erreur ou du bon fonctionnement du serveur//
 server.on('error', errorHandler);
