@@ -3,7 +3,7 @@
 /************************************************************/
 const passwordValidator = require('password-validator');
 
-//création du schéma de mot de passe
+// Création du schéma de mot de passe
 const schemaPassword = new passwordValidator();
 
 // Ajout propriétés

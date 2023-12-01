@@ -11,12 +11,12 @@ const MIME_TYPES = {
     'image/webp' : 'webp',
 }
 
-//stokage des fichiers dans le dossier images
+// Stokage des fichiers dans le dossier images
 const storage = multer.diskStorage({
     destination: (req, file, callback) => {
         callback(null, 'images')
     },
-    //renommage des fichiers
+    // Renommage des fichiers
     filename:(req, file, callback) =>{
         const name = file.originalname.split(' ').join('_')
         const extension = MIME_TYPES[file.mimetype]

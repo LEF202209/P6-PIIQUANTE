@@ -1,10 +1,14 @@
-// importer le package http de Node //
+/************************************************************/
+/*****************   server.js  *****************************/
+/************************************************************/
+
+// Importer le package http de Node //
 const http=require('http');
-// importer l'application express //
+// Importer l'application express //
 const app=require('./app');
 
 
-// normalisation du port //
+// Normalisation du port //
 const normalizePort = val => {
     const port = parseInt(val, 10);
   
@@ -18,7 +22,7 @@ const normalizePort = val => {
   };
   const port = normalizePort(process.env.PORT || '3000');
   app.set('port', port);
-  // gestion des erreurs de port //
+  // Gestion des erreurs de port //
   const errorHandler = error => {
     if (error.syscall !== 'listen') {
       throw error;
@@ -39,14 +43,14 @@ const normalizePort = val => {
     }
   };
   
-// créer le serveur et lier l'application 'express' au serveur http //
+// Créer le serveur et lier l'application 'express' au serveur http //
 const server=http.createServer(app);
-// affichage de l'erreur ou du bon fonctionnement du serveur//
+// Affichage de l'erreur ou du bon fonctionnement du serveur//
 server.on('error', errorHandler);
 server.on('listening', () => {
   const address = server.address();
   const bind = typeof address === 'string' ? 'pipe ' + address : 'port ' + port;
   console.log('Listening on ' + bind);
 });
-// écouter  les réponses envoyés //
+// Ecouter  les réponses envoyés //
 server.listen(process.env.PORT ||3000);

@@ -3,7 +3,7 @@ const fs= require('fs');
 const xss= require('xss');
 var messageMAJ='';
 
-  // Sécurité xss : Échapper chaque propriété de sauceObject
+  // Sécurité xss : Échapper chaque propriété de sauceObj
 function escapeObject (sauceObj) {
     for (let key in sauceObj) {
       if (typeof sauceObj[key] === 'string') {
@@ -12,16 +12,16 @@ function escapeObject (sauceObj) {
      return sauceObj
 }
 
-
+// Fonction pour créer une sauce
 function createSauce (req, res) {
     // Importer les données saisies
     let sauceObject = JSON.parse(req.body.sauce);
-    //Appel de la fonction escapeObject pour échapper les propriétés de type string (Sécurité xss)
+    // Appel de la fonct° esapeObject, modifier info° pour éviter les failles xss
     sauceObject = escapeObject(sauceObject);
 
     delete sauceObject._id;
     delete sauceObject._userId;
-    //Ajout des informations du formulaire à partir du modèle sauce
+    // Ajout des informations du formulaire à partir du modèle sauce
     const sauce = new Sauce({
       ...sauceObject, 
       userId: req.auth.userId,
@@ -31,27 +31,30 @@ function createSauce (req, res) {
 	  usersLiked: '[]',
   	  usersDisliked: '[]'
     })
-    // Sauvegarde des données ajoutées
+    // Sauvegarde des données ajoutées dans BDD
     sauce.save()
       .then(() => res.status(201).json({ message: 'Sauce enregistrée !' }))
       .catch(error => res.status(400).json({ error }))
   }
-  
+
+  // Fonction pour lire toutes les sauces
 function getAllSauces  (req, res) {
     Sauce.find()
       .then(sauces => res.status(200).json(sauces))
       .catch(error => res.statut(400).json({ error }))
   }
 
-  function getOneSauce   (req, res) {
+  // Fonction pour lire une sauce qui possède l'Id en paramètre
+function getOneSauce   (req, res) {
     Sauce.findOne({ _id: req.params.id })
       .then(thing => res.status(200).json(thing))
       .catch(error => res.status(404).json({ error }));
   }
 
+  // Fonction pour modifier une sauce
 function modifySauce (req,res){
     // importer les nouvelles données
-    // si téléchargement fichier
+    // téléchargement fichier ?
     let sauceObject = req.file? 
     {
         // format objet transmis sous forme de chaîne de caractères
@@ -75,7 +78,7 @@ function modifySauce (req,res){
             res.status(403).json({message:'accès non autorisé!'})
         }
         else {
-            // Appel à la fonct° escapeObject pour échapper les propriétés de type string (Sécurité xss)
+            // Appel de la fonct° esapeObject, modifier info° pour éviter les failles xss
             sauceObject = escapeObject(sauceObject);
             // Mise à jour des données
             if (req.file) {
@@ -96,7 +99,7 @@ function modifySauce (req,res){
     .catch(error => res.status(400).json({error}))
   }
  
-
+// Fonction pour supprimer une sauce
 function deleteSauce (req,res){
     Sauce.findOne ({_id:req.params.id})
     .then((sauce) =>{
@@ -116,6 +119,7 @@ function deleteSauce (req,res){
     }})
 }
 
+// Fonction pour liker/disliker une sauce
 function likeSauce (req,res){
     const userId = req.body.userId;
     const like = req.body.like;
@@ -129,8 +133,9 @@ function likeSauce (req,res){
             const userDisliked = sauce.usersDisliked.includes(userId);
             const update = {};
             switch (like) {
-                // liker la sauce
+                // 1 = liker la sauce
                 case 1 : {
+                    // Utilisateur n a pas déjà liké ou disliké la sauce ?
                     if (!userLiked && !userDisliked) {
                         update.$inc = {likes:1};
                         update.$push ={usersLiked:userId};
@@ -141,7 +146,7 @@ function likeSauce (req,res){
                     }
                 }
                 break;
-                // disliker la sauce
+                // -1 = disliker la sauce
                 case -1 : {
                     if (!userLiked && !userDisliked) {
                         update.$inc = {dislikes:1};
@@ -153,13 +158,15 @@ function likeSauce (req,res){
                     }
                 }
                 break;
-                // annuler son choix
+                // annuler son choix : on enlève le like ou le dislike
                 case 0 : {
+                    // utilisateur a aimé la sauce ?
                     if (userLiked) {
                         update.$inc = {likes:-1};
                         update.$pull ={usersLiked:userId};
                         messageMAJ='Like supprimé !'
                     }
+                    // utilisateur n'a pas aimé la sauce ?
                     else if (userDisliked) {
                         update.$inc = {dislikes:-1};
                         update.$pull ={usersDisliked:userId};
