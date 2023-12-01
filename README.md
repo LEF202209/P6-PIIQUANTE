@@ -1,4 +1,4 @@
-# P6-PIIQUANTE-NV
+# P6-PIIQUANTE
 Construisez une API sécurisée pour une application d'avis gastronomiques
 
 Ce projet est basé sur la création du backend pour un site de critiques de sauces piquantes.
